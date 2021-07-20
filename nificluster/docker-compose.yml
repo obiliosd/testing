@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  zookeeper:
+    hostname: zookeeper
+    image: 'bitnami/zookeeper:latest'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - nifinet
+  nifi01:
+    image: apache/nifi:1.14.0
+    ports:
+      - 6980:8080
+    networks:
+      - nifinet
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080
+      - NIFI_CLUSTER_IS_NODE=true
+      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
+      - NIFI_ZK_CONNECT_STRING=zookeeper:2181
+      - NIFI_ELECTION_MAX_WAIT=1 min
+  nifi02:
+    image: apache/nifi:1.14.0
+    ports:
+      - 6979:8080
+    networks:
+      - nifinet
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080
+      - NIFI_CLUSTER_IS_NODE=true
+      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
+      - NIFI_ZK_CONNECT_STRING=zookeeper:2181
+      - NIFI_ELECTION_MAX_WAIT=1 min
+  nifi03:
+    image: apache/nifi:1.14.0
+    ports:
+      - 6978:8080
+    networks:
+      - nifinet
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080
+      - NIFI_CLUSTER_IS_NODE=true
+      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
+      - NIFI_ZK_CONNECT_STRING=zookeeper:2181
+      - NIFI_ELECTION_MAX_WAIT=1 min
+networks:
+  nifinet:
+    driver: bridge
