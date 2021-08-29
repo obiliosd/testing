@@ -4,8 +4,8 @@ services:
     container_name: nifi
     image: apache/nifi:1.13.2
     ports:
-      - 12010:8800
-      - 12021:9092
+      - 12011:8800
+      - 12012:9092
     environment:
       - NIFI_WEB_HTTP_PORT=8800
     volumes:

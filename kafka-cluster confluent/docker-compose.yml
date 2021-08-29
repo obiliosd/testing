@@ -9,13 +9,13 @@ services:
     hostname: broker
     container_name: broker
     ports:
-      - "12018:9092"
-      - "12011:9101"
+      - "12013:9092"
+      - "12014:9101"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:12018
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:12013
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
@@ -38,7 +38,7 @@ services:
     depends_on:
       - broker
     ports:
-      - "12012:8081"
+      - "12015:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
@@ -52,7 +52,7 @@ services:
       - broker
       - schema-registry
     ports:
-      - "12013:8083"
+      - "12016:8083"
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
       CONNECT_REST_ADVERTISED_HOST_NAME: connect
@@ -85,7 +85,7 @@ services:
       - connect
       - ksqldb-server
     ports:
-      - "12014:9021"
+      - "12017:9021"
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
       CONTROL_CENTER_CONNECT_CLUSTER: 'connect:8083'
@@ -106,7 +106,7 @@ services:
       - broker
       - connect
     ports:
-      - "12015:8088"
+      - "12018:8088"
     environment:
       KSQL_CONFIG_DIR: "/etc/ksql"
       KSQL_BOOTSTRAP_SERVERS: "broker:29092"
@@ -159,7 +159,7 @@ services:
       - broker
       - schema-registry
     ports:
-      - 12016:8082
+      - 12019:8082
     hostname: rest-proxy
     container_name: rest-proxy
     environment:
