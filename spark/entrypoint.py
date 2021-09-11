@@ -1,5 +1,4 @@
-  
-import pyspark
+import pyspark 
 import os
 from pyspark.conf import SparkConf
 from pyspark.sql import SparkSession
@@ -10,7 +9,7 @@ def get_spark_context(app_name: str) -> SparkSession:
     configuration params in one place. See below comments for details:
         |_ https://github.com/bitnami/bitnami-docker-spark/issues/18#issuecomment-700628676
         |_ https://github.com/leriel/pyspark-easy-start/blob/master/read_file.py
-    """
+    
     conf = SparkConf()
     conf.setAll(
         [
@@ -22,6 +21,13 @@ def get_spark_context(app_name: str) -> SparkSession:
         ]
     )
     return SparkSession.builder.config(conf=conf).getOrCreate()
+    """
+    return SparkSession.\
+        builder.\
+        appName("pyspark-notebook").\
+        master("spark://spark-master:7077").\
+        config("spark.executor.memory", "512m").\
+        getOrCreate()
 
 def run_spark_example(spark) -> None:
     from pyspark.sql.types import IntegerType
@@ -56,8 +62,20 @@ def run_spark_print(spark) -> None:
     print("The number of lines containing 'the' in your file is: ", python_lines.count())
 
 if __name__ == "__main__":
+    
     # Regular Spark job executed on a Docker container
     spark = get_spark_context("employees")
-    #run_spark_example(spark)
-    run_spark_print(spark)
+    run_spark_example(spark)
+    #run_spark_print(spark)
     spark.stop()
+    """
+
+    spark = SparkSession.\
+        builder.\
+        appName("pyspark-notebook").\
+        master("spark://spark-master:7077").\
+        config("spark.executor.memory", "512m").\
+        getOrCreate()
+    sc = spark.sparkContext
+    print("hello wordl")
+    """
