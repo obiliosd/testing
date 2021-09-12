@@ -8,6 +8,7 @@ services:
       - "7077:7077"
     environment:
       - INIT_DAEMON_STEP=setup_spark
+
   spark-worker-1:
     image: bde2020/spark-worker:3.1.1-hadoop3.2
     container_name: spark-worker-1
@@ -17,6 +18,7 @@ services:
       - "8081:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
+
   spark-worker-2:
     image: bde2020/spark-worker:3.1.1-hadoop3.2
     container_name: spark-worker-2
@@ -26,6 +28,7 @@ services:
       - "8082:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
+      
   py-spark:
     build: ./app
     depends_on:
@@ -35,3 +38,8 @@ services:
       - "SPARK_MASTER=spark://spark-master:7077"
     volumes:
       - ./app/src:/app
+
+networks:
+ default:
+   external:
+     name: kafka-cc-spark_kafka

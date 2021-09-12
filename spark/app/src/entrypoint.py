@@ -35,7 +35,18 @@ def run_spark_example(spark) -> None:
     second_highest_salary.show()
 
 if __name__ == "__main__":
-    # Regular Spark job executed on a Docker container
+    #Test 1
     spark = get_spark_context("can of the bac")
     run_spark_example(spark)
+
+    #Test conexion kafka
+    df = spark \
+        .readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "localhost:9092") \
+        .option("subscribe", "test") \
+        .load()
+    df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    print(df)
+
     spark.stop()
