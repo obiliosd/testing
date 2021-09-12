@@ -27,9 +27,11 @@ services:
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
   py-spark:
-    build: .
+    build: ./app
     depends_on:
       - spark-master
     environment:
       - ENABLE_INIT_DAEMON=false
       - "SPARK_MASTER=spark://spark-master:7077"
+    volumes:
+      - ./app/src:/app
