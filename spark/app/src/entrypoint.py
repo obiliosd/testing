@@ -2,12 +2,12 @@ from pyspark.conf import SparkConf
 from pyspark.sql import SparkSession
 
 def get_spark_context(app_name: str) -> SparkSession:
-    return SparkSession.\
-        builder.\
-        appName(app_name).\
-        master("spark://spark-master:7077").\
-        config("spark.executor.memory", "512m").\
-        getOrCreate()
+    return SparkSession\
+        .builder\
+        .appName(app_name)\
+        .master("spark://spark-master:7077")\
+        .config("spark.executor.memory", "512m")\
+        .getOrCreate()
 
 def run_spark_example(spark) -> None:
     from pyspark.sql.types import IntegerType
@@ -36,7 +36,7 @@ def run_spark_example(spark) -> None:
 
 if __name__ == "__main__":
     #Test 1
-    spark = get_spark_context("can of the bac")
+    spark = get_spark_context("cada de la vaca paca")
     run_spark_example(spark)
 
     #Test conexion kafka
@@ -48,5 +48,6 @@ if __name__ == "__main__":
         .load()
     df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
     print(df)
+    print("pingocha peluda")
 
     spark.stop()
