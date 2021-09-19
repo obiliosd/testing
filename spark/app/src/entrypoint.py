@@ -24,19 +24,18 @@ def foreach_batch_function(df, epoch_id):
         # Create a data frame to be written to HDFS
         sensor_df = df.selectExpr('CAST(value AS STRING)').select(from_json("value", jsonSchema).alias("value")).select("value.*")
 
-def run_spark_kafka_structure_stream(spark) -> None:
+def run_spark_kafka_structure_stream(spark: SparkSession) -> None:
     #Test conexion kafka
     df = spark \
         .readStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", "localhost:9092") \
+        .option("kafka.bootstrap.servers", "broker:29092") \
         .option("subscribe", "test") \
+        .option("kafka.request.timeout.ms", "60000") \
+        .option("kafka.session.timeout.ms", "30000") \
+        .option("failOnDataLoss", "true") \
+        .option("startingOffsets", "latest") \
         .load()
-        #.option("kafka.request.timeout.ms", "60000") \
-        #.option("kafka.session.timeout.ms", "30000") \
-        #.option("failOnDataLoss", "true") \
-        #.option("startingOffsets", "latest") \
-        #.load()
         
     words = df.selectExpr('CAST(value AS STRING)') \
         .select(from_json("value", jsonSchema).alias("value")) \
