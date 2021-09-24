@@ -1,12 +1,8 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.types import *
-from pyspark.sql.functions import from_json 
+from pyspark.ml.clustering import KMeans
+from pyspark.ml.evaluation import ClusteringEvaluator
 
-# Define the schema to speed up processing
-jsonSchema = StructType(
-    [StructField("value0", StringType(), True), 
-    StructField("value1", ArrayType(DoubleType()), True)])
-
+#Need numpy
 def get_spark_session(app_name: str) -> SparkSession:
     spark = SparkSession\
         .builder\
@@ -16,50 +12,35 @@ def get_spark_session(app_name: str) -> SparkSession:
         .getOrCreate()
     return spark
 
-def foreach_batch_function(df, epoch_id):
-    # Transform and write batchDF
-    if df.count() <= 0:
-        None
-    else:
-        # Create a data frame to be written to HDFS
-        sensor_df = df.selectExpr('CAST(value AS STRING)').select(from_json("value", jsonSchema).alias("value")).select("value.*")
-
-def run_spark_kafka_structure_stream(spark: SparkSession) -> None:
-    #Test conexion kafka
-    df = spark \
-        .readStream \
-        .format("kafka") \
-        .option("kafka.bootstrap.servers", "broker:29092") \
-        .option("subscribe", "test") \
-        .option("kafka.request.timeout.ms", "60000") \
-        .option("kafka.session.timeout.ms", "30000") \
-        .option("failOnDataLoss", "true") \
-        .option("startingOffsets", "latest") \
-        .load()
-        
-    words = df.selectExpr('CAST(value AS STRING)') \
-        .select(from_json("value", jsonSchema).alias("value")) \
-        .select("value.value0")
-    
-    # Generate running word count
-    wordCounts = words.groupBy("value0").count()
-
-     # Start running the query that prints the running counts to the console
-    query = wordCounts \
-        .writeStream \
-        .outputMode("complete") \
-        .format("console") \
-        .start()
-
-    query.awaitTermination()
-    """
-    """
-    # run
-    #writer = df.writeStream.foreachBatch(foreach_batch_function).start().awaitTermination()
-
 if __name__ == "__main__":
-    #Test 1
-    spark = get_spark_session("Stream-kafka")
-    run_spark_kafka_structure_stream(spark)
+    spark = get_spark_session("kmeans")
+    # $example on$
+    # Loads data.
+    dataset = spark.read.format("libsvm").load("spark/data/mllib/sample_kmeans_data.txt")
+
+    # Trains a k-means model.
+    kmeans = KMeans().setK(2).setSeed(1)
+    model = kmeans.fit(dataset)
+
+    # Make predictions
+    predictions = model.transform(dataset)
+
+    # Evaluate clustering by computing Silhouette score
+    evaluator = ClusteringEvaluator()
+
+    silhouette = evaluator.evaluate(predictions)
+    print("Silhouette with squared euclidean distance = " + str(silhouette))
+
+    # Shows the result.
+    centers = model.clusterCenters()
+    print("Cluster Centers: ")
+    for center in centers:
+        print(center)
+    # $example off$
+
+    dir = "hdfs://namenode:8020/model/model1"
+    print("Save model in hdfs: " + dir)
+    model.write().overwrite().save(dir)
+
     spark.stop()
 
